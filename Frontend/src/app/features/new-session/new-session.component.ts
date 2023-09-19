@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SessionService } from '../../services/session-service/session.service';
 import { ICreateSessionDto, IResponseDto } from '../models/session.model';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -15,7 +16,7 @@ export class NewSessionComponent {
   errorMessage = '';
 
   constructor(
-    private popup: MatDialogRef<NewSessionComponent>,
+    protected popup: MatDialogRef<NewSessionComponent>,
     private fb: FormBuilder,
     private sessionservice: SessionService,
     private toastrService: ToastrService
@@ -47,7 +48,6 @@ export class NewSessionComponent {
   }
 
   createSession() {
-    localStorage.setItem('RMname', 'Ram');
     const sessionData: ICreateSessionDto = {
       customerId: this.createSessionForm.value.customerId || '',
       sessionName: this.createSessionForm.value.sessionName || '',
@@ -62,11 +62,12 @@ export class NewSessionComponent {
       () => {
         this.errorMessage = 'Failed to create the session!';
         this.isLoading = false;
+        this.toastrService.error(this.errorMessage, 'Error');
       }
     );
   }
   closeModal() {
-    this.popup.close();
+    this.popup.close(true);
   }
   onClose() {
     this.popup.close();

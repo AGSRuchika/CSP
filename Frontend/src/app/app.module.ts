@@ -29,9 +29,11 @@ import { ToastrModule } from 'ngx-toastr';
 import { NewSessionComponent } from './features/new-session/new-session.component';
 import { LoginComponent } from './features/login/login.component';
 import { DeleteSessionComponent } from './features/delete-session/delete-session.component';
-import { NgxUiLoaderHttpModule, NgxUiLoaderModule } from 'ngx-ui-loader';
 import { SessionInterceptor } from './services/api/session-interceptor';
+import { NgxUiLoaderHttpModule, NgxUiLoaderModule } from 'ngx-ui-loader';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ArchiveSessionComponent } from './features/archive-session/archive-session.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +47,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     LoginComponent,
     DeleteSessionComponent,
     PageNotFoundComponent,
+    ArchiveSessionComponent
   ],
   imports: [
     BrowserModule,
@@ -74,12 +77,14 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     }),
     NgxUiLoaderModule,
     NgxUiLoaderHttpModule.forRoot({
-      showForeground:true,
-      minTime:30,
-      maxTime:-1
-    })
+      showForeground: true,
+      minTime: 30,
+      maxTime: -1,
+    }),
   ],
-  providers: [{provide:HTTP_INTERCEPTORS,useClass:SessionInterceptor,multi:true}],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: SessionInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

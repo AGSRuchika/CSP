@@ -11,14 +11,20 @@ import { IUpdateSessionDto } from '../../features/models/session.model';
   providedIn: 'root',
 })
 export class SessionService {
-  private sessions = 'http://localhost:8080/sessions';
+  private sessions = 'http://172.16.238.164:8080/sessions';
   constructor(private http: HttpClient) {}
 
-  getSessions(status: string, offset: number, pageSize: number): Observable<IApiResponses> {
+  getSessions(
+    status: string,
+    offset: number,
+    pageSize: number
+  ): Observable<IApiResponses> {
     const params = new HttpParams()
-    .set('pageNo', offset.toString())
-    .set('pageSize', pageSize.toString());
-    return this.http.get<IApiResponses>(`${this.sessions}/${status}`,{params,});
+      .set('pageNo', offset.toString())
+      .set('pageSize', pageSize.toString());
+    return this.http.get<IApiResponses>(`${this.sessions}/${status}`, {
+      params,
+    });
   }
 
   createSession(sessionData: ICreateSessionDto): Observable<IResponseDto> {
@@ -30,11 +36,6 @@ export class SessionService {
     const url = `${this.sessions}/${sessionId}`;
     return this.http.delete<IResponseDto>(url);
   }
-
-  archiveSession(sessionId: string): Observable<IResponseDto> {
-    const url = `${this.sessions}/archive/${sessionId}`;
-    return this.http.put<IResponseDto>(url, null);
-  }
   updateSession(
     sessionID: string,
     updateSessionDto: IUpdateSessionDto
@@ -42,4 +43,9 @@ export class SessionService {
     const url = `${this.sessions}/${sessionID}`;
     return this.http.put<IResponseDto>(url, updateSessionDto);
   }
+  archiveSession(sessionId: string): Observable<IResponseDto> {
+    const url = `${this.sessions}/archive/${sessionId}`;
+    return this.http.put<IResponseDto>(url, null);
+  }
+
 }

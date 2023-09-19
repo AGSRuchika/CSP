@@ -10,6 +10,8 @@ import { EditSessionComponent } from '../edit-session/edit-session.component';
 import { SessionService } from '../../services/session-service/session.service';
 import { DeleteSessionComponent } from '../delete-session/delete-session.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, throwError } from 'rxjs';
+import { ArchiveSessionComponent } from '../archive-session/archive-session.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,7 +59,7 @@ export class DashboardComponent implements OnInit {
     private sessionService: SessionService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
-  ) {}
+  ) { }
 
   onTabChange(event: MatTabChangeEvent) {
     if (event.index === 1) {
@@ -91,6 +93,15 @@ export class DashboardComponent implements OnInit {
     const offset = this.currentPage;
     this.sessionService
       .getSessions(sessionStatus, offset, this.pageSize)
+      .pipe(
+        catchError((err) => {
+          if (err.status === 400) {
+              console.log();
+
+          }
+          return throwError(err);
+        })
+      )
       .subscribe(
         (response: IApiResponses) => {
           this.noSessions = false;
@@ -124,31 +135,31 @@ export class DashboardComponent implements OnInit {
       width: '35%',
       data: session,
     });
-    dialogRef.afterClosed().subscribe(() => {
-      this.getData();
+    dialogRef.afterClosed().subscribe((isDeleteSuccessful: boolean) => {
+      if (isDeleteSuccessful) {
+        this.getData();
+      }
     });
   }
 
   archiveSession(session: ISession) {
-    const sesionId = session.sessionId;
-    this.sessionService
-      .archiveSession(sesionId)
-      .subscribe((x: IResponseDto) => {
-        this.snackBar.open(x.message, 'Close', {
-          duration: 4000,
-        });
+    const dialogRef = this.dialog.open(ArchiveSessionComponent, {
+      data: session,
+      width: '35%',
+    });
+
+    dialogRef.afterClosed().subscribe((isArchiveSuccessful: boolean) => {
+      if (isArchiveSuccessful) {
         this.getData();
-      });
+      }
+    });
   }
 
   viewSession(session: ISession): void {
-    const dialogref = this.dialog.open(ViewSessionComponent, {
+    this.dialog.open(ViewSessionComponent, {
       width: '32%',
       height: '60%',
       data: session,
-    });
-    dialogref.afterClosed().subscribe((result) => {
-      result;
     });
   }
 
@@ -157,8 +168,10 @@ export class DashboardComponent implements OnInit {
       width: '28%',
       height: 'auto',
     });
-    dialogRef.afterClosed().subscribe(() => {
-      this.getData();
+    dialogRef.afterClosed().subscribe((isCreatedSession: boolean) => {
+      if (isCreatedSession) {
+        this.getData();
+      }
     });
   }
 
